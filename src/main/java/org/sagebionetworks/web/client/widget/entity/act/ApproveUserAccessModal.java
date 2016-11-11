@@ -71,6 +71,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private JobTrackingWidget progressWidget;
+	private UserBadgeList userBadgeList;
 	
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
@@ -79,16 +80,18 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			UserGroupSuggestionProvider provider, 
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
-			JobTrackingWidget progressWidget) {
+			JobTrackingWidget progressWidget,
+			UserBadgeList userBadgeList) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.progressWidget = progressWidget;
+		this.userBadgeList = userBadgeList;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
-		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
+		this.view.setUserPickerWidget(userBadgeList.asWidget());
 		view.setLoadingEmailWidget(this.progressWidget.asWidget());
 		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			@Override

@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
+import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
@@ -63,6 +64,8 @@ public class ApproveUserAccessModalTest {
 	JobTrackingWidget mockProgressWidget;
 	@Mock
 	SynapseSuggestion mockUser;
+	@Mock
+	UserBadgeList mockUserBadgeList;
 	@Mock
 	EntityBundle mockEntityBundle;
 	@Mock
@@ -97,7 +100,7 @@ public class ApproveUserAccessModalTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget);
+		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget, mockUserBadgeList);
 		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn("syn7444807");
 		
 		message = "Message";
