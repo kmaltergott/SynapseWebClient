@@ -58,8 +58,8 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	
 	public void onUserSelected(SynapseSuggestion suggestion) {
 		view.addUserBadge(suggestion);
+		peopleSuggestWidget.setSelectedSuggestion(null);
 		peopleSuggestWidget.clear();
-		peopleSuggestWidget.setText("");
 	}
 	
 	/**
