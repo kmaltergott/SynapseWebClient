@@ -10,7 +10,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -71,19 +70,18 @@ public class UserBadgeListViewImpl implements UserBadgeListView {
 		userSelectorContainer.add(widget);
 	}
 	
-	@Override
 	public void setUploadWidgetVisible(boolean visible) {
 		userSelectorContainer.setVisible(visible);
 	}
 	@Override
-	public void addUserBadge(String userId) {
+	public void addUserBadge(SynapseSuggestion user) {
 		HTML ta = new HTML();
-		ta.setHTML(userId);
+		ta.setHTML(user.getReplacementString());
 		userBadgeContainer.add(ta.asWidget());
 	}
 	
 	@Override
-	public void clearFileLinks() {
+	public void clearUserBadges() {
 		userBadgeContainer.clear();		
 	}
 	

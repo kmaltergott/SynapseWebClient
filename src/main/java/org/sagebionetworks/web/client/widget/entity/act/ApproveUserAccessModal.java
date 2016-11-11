@@ -91,7 +91,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		this.userBadgeList = userBadgeList;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
-		this.view.setUserPickerWidget(userBadgeList.asWidget());
+		this.view.setUserPickerWidget(userBadgeList.setCanDelete(true).asWidget());
 		view.setLoadingEmailWidget(this.progressWidget.asWidget());
 		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			@Override

@@ -4,18 +4,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.upload.FileHandleLink;
-import org.sagebionetworks.web.client.widget.upload.FileHandleListView;
-import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -29,7 +24,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	boolean isToolbarVisible, changingSelection; //canDelete
 	CallbackP<String> fileHandleClickedCallback;
 	Callback selectionChangedCallback;
-	List<FileHandleLink> links; //UserBadgeLink?
+	List<SynapseSuggestion> suggestions;
 	SynapseSuggestBox peopleSuggestWidget;	
 	
 	@Inject
@@ -62,9 +57,9 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	}
 	
 	public void onUserSelected(SynapseSuggestion suggestion) {
-		
-		view.addUserBadge(suggestion.getReplacementString());
+		view.addUserBadge(suggestion);
 		peopleSuggestWidget.clear();
+		peopleSuggestWidget.setText("");
 	}
 	
 	/**
@@ -73,10 +68,9 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	 */
 	public UserBadgeList configure(
 			CallbackP<String> fileHandleClickedCallback){
-		links = new ArrayList<FileHandleLink>();
+		suggestions = new ArrayList<SynapseSuggestion>();
 		this.isToolbarVisible = false;
 		view.setToolbarVisible(false);
-		view.setUploadWidgetVisible(false);
 		this.fileHandleClickedCallback = fileHandleClickedCallback;
 		return this;
 	};
@@ -98,20 +92,20 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	}
 	
 	public void addFileLink(String fileHandleId, String fileName) {
-		FileHandleLink link = ginInjector.getFileHandleLink();
-		link.configure(fileHandleId, fileName, fileHandleClickedCallback)
-		.setFileSelectCallback(selectionChangedCallback)
-		.setSelectVisible(isToolbarVisible);
-		links.add(link);
+//		FileHandleLink link = ginInjector.getFileHandleLink();
+//		link.configure(fileHandleId, fileName, fileHandleClickedCallback)
+//		.setFileSelectCallback(selectionChangedCallback)
+//		.setSelectVisible(isToolbarVisible);
+//		links.add(link);
 	}
 	
 	public void refreshLinkUI() {
-		view.clearFileLinks();
-		for (FileHandleLink fileHandleLink : links) {
-			view.addUserBadge(fileHandleLink.getFileHandleId());
+		view.clearUserBadges();
+		for (SynapseSuggestion s : suggestions) {
+			view.addUserBadge(s);
 		}
 		
-		boolean toolbarVisible = isToolbarVisible && links.size() > 0;
+		boolean toolbarVisible = isToolbarVisible && suggestions.size() > 0;
 		view.setToolbarVisible(toolbarVisible);
 		if (toolbarVisible) {
 			checkSelectionState();	
@@ -121,12 +115,9 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	@Override
 	public void deleteSelected() {
 		//remove all selected file links
-		Iterator<FileHandleLink> it = links.iterator();
+		Iterator<SynapseSuggestion> it = suggestions.iterator();
 		while(it.hasNext()){
-			FileHandleLink row = it.next();
-			if(row.isSelected()){
-				it.remove();
-			}
+			SynapseSuggestion row = it.next();
 		}
 		refreshLinkUI();
 	}
@@ -140,8 +131,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		try{
 			changingSelection = true;
 			// Select all
-			for (FileHandleLink fileHandleLink : links) {
-				fileHandleLink.setSelected(select);
+			for (SynapseSuggestion s : suggestions) {
 			}
 		}finally{
 			changingSelection = false;
@@ -156,10 +146,8 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	public void checkSelectionState(){
 		if(!changingSelection && isToolbarVisible){
 			int count = 0;
-			for (FileHandleLink link : links) {
-				if(link.isSelected()){
-					count++;
-				}
+			for (SynapseSuggestion s : suggestions) {
+				
 			}
 			view.setCanDelete(count > 0);
 		}
@@ -176,16 +164,13 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	}
 	
 	@Override
-	public List<String> getFileHandleIds() {
-		List<String> fileHandleIds = new ArrayList<String>();
-		for (FileHandleLink link : links) {
-			fileHandleIds.add(link.getFileHandleId());
-		}
-		return fileHandleIds;
-	}
-	
-	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+
+	@Override
+	public List<String> getUserBadges() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
