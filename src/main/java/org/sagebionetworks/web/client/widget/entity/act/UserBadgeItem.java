@@ -67,6 +67,12 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		return this;
 	}
 	
+	public UserBadgeItem configure(String ownerId, Callback callback) {
+		selectionChangedCallback = callback;
+		configure(ownerId);
+		return this;
+	}
+	
 	public UserBadgeItem setSelectionChangedCallback(Callback callback) {
 		selectionChangedCallback = callback;
 		return this;
