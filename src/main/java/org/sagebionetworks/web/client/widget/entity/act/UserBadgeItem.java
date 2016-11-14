@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -34,7 +33,6 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	Widget widget;
 	
 	String fileHandleId;
-	CallbackP<String> fileClickedCallback;
 	Callback selectionChangedCallback;
 	PortalGinInjector portalGinInjector;
 	@Inject
@@ -60,6 +58,9 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 			@Override
 			public void onClick(ClickEvent event) {
 				setSelected(!isSelected());
+				if (selectionChangedCallback != null) {
+					selectionChangedCallback.invoke();
+				}
 			}
 		});
 		userBadgeContainer.add(userBadge.asWidget());
