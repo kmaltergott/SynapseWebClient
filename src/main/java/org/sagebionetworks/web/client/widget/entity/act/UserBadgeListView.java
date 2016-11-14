@@ -19,7 +19,7 @@ public interface UserBadgeListView extends IsWidget {
 	void setPresenter(Presenter presenter);
 	void setToolbarVisible(boolean visible);
 	void setSelectorWidget(Widget widget);
-	void addUserBadge(SynapseSuggestion suggestion);
+	void addUserBadge(Widget widget);
 	void clearUserBadges();
 	void setCanDelete(boolean canDelete);
 }

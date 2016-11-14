@@ -60,6 +60,7 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
+import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -331,6 +332,7 @@ public interface PortalGinInjector extends Ginjector {
 	
 	// Other widgets
 	public UserBadge getUserBadgeWidget();
+	public UserBadgeItem getUserBadgeItem();
 	public VersionTimer getVersionTimer();
 	public Md5Link getMd5Link();
 	public QuestionContainerWidget getQuestionContainerWidget();

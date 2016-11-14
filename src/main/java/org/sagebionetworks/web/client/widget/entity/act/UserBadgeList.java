@@ -22,10 +22,9 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	UserBadgeListView view;
 	PortalGinInjector ginInjector;
 	boolean isToolbarVisible, changingSelection; //canDelete
-	CallbackP<String> fileHandleClickedCallback;
-	Callback selectionChangedCallback;
-	List<SynapseSuggestion> suggestions;
+	List<UserBadgeItem> users;
 	SynapseSuggestBox peopleSuggestWidget;	
+	Callback selectionChangedCallback;
 	
 	@Inject
 	public UserBadgeList (
@@ -40,13 +39,13 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 		this.view.setSelectorWidget(peopleSuggestWidget.asWidget());
+		users = new ArrayList<UserBadgeItem>();
 		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			@Override
 			public void invoke(SynapseSuggestion suggestion) {
 				onUserSelected(suggestion);
 			}
 		});
-		
 		selectionChangedCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -57,21 +56,14 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	}
 	
 	public void onUserSelected(SynapseSuggestion suggestion) {
-		view.addUserBadge(suggestion);
-		peopleSuggestWidget.setSelectedSuggestion(null);
+		addUserBadge(suggestion.getId());
 		peopleSuggestWidget.clear();
+		refreshLinkUI();
 	}
 	
-	/**
-	 * - canUpload if true then show upload
-	 * - On file click handler callback.  When file handle is clicked, then this will be called and given the file handle id clicked.
-	 */
-	public UserBadgeList configure(
-			CallbackP<String> fileHandleClickedCallback){
-		suggestions = new ArrayList<SynapseSuggestion>();
+	public UserBadgeList configure(){
 		this.isToolbarVisible = false;
 		view.setToolbarVisible(false);
-		this.fileHandleClickedCallback = fileHandleClickedCallback;
 		return this;
 	};
 	
@@ -86,26 +78,20 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		return this;
 	}
 	
-	public void addFileLink(FileUpload fileUpload) {
-		addFileLink(fileUpload.getFileHandleId(), fileUpload.getFileMeta().getFileName());
-		refreshLinkUI();
-	}
-	
-	public void addFileLink(String fileHandleId, String fileName) {
-//		FileHandleLink link = ginInjector.getFileHandleLink();
-//		link.configure(fileHandleId, fileName, fileHandleClickedCallback)
-//		.setFileSelectCallback(selectionChangedCallback)
-//		.setSelectVisible(isToolbarVisible);
-//		links.add(link);
+	public void addUserBadge(String userId) {
+		UserBadgeItem item = ginInjector.getUserBadgeItem();
+		item.configure(userId).setSelectionChangedCallback(selectionChangedCallback);
+		users.add(item);
+		view.addUserBadge(item.asWidget());
 	}
 	
 	public void refreshLinkUI() {
 		view.clearUserBadges();
-		for (SynapseSuggestion s : suggestions) {
-			view.addUserBadge(s);
+		for (UserBadgeItem item : users) {
+			view.addUserBadge(item.asWidget());
 		}
 		
-		boolean toolbarVisible = isToolbarVisible && suggestions.size() > 0;
+		boolean toolbarVisible = isToolbarVisible && users.size() > 0;
 		view.setToolbarVisible(toolbarVisible);
 		if (toolbarVisible) {
 			checkSelectionState();	
@@ -115,9 +101,12 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	@Override
 	public void deleteSelected() {
 		//remove all selected file links
-		Iterator<SynapseSuggestion> it = suggestions.iterator();
+		Iterator<UserBadgeItem> it = users.iterator();
 		while(it.hasNext()){
-			SynapseSuggestion row = it.next();
+			UserBadgeItem row = it.next();
+			if(row.isSelected()){
+				it.remove();
+			}
 		}
 		refreshLinkUI();
 	}
@@ -131,7 +120,8 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		try{
 			changingSelection = true;
 			// Select all
-			for (SynapseSuggestion s : suggestions) {
+			for (UserBadgeItem item : users) {
+				item.setSelected(select);
 			}
 		}finally{
 			changingSelection = false;
@@ -146,8 +136,8 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	public void checkSelectionState(){
 		if(!changingSelection && isToolbarVisible){
 			int count = 0;
-			for (SynapseSuggestion s : suggestions) {
-				
+			for (UserBadgeItem item : users) {
+				count += item.isSelected() ? 1 : 0;
 			}
 			view.setCanDelete(count > 0);
 		}

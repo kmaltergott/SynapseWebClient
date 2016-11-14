@@ -3,13 +3,11 @@ package org.sagebionetworks.web.client.widget.entity.act;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -74,10 +72,8 @@ public class UserBadgeListViewImpl implements UserBadgeListView {
 		userSelectorContainer.setVisible(visible);
 	}
 	@Override
-	public void addUserBadge(SynapseSuggestion user) {
-		HTML ta = new HTML();
-		ta.setHTML(user.getReplacementString());
-		userBadgeContainer.add(ta.asWidget());
+	public void addUserBadge(Widget user) {
+		userBadgeContainer.add(user.asWidget());
 	}
 	
 	@Override
