@@ -20,7 +20,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 
 	UserBadgeListView view;
 	PortalGinInjector ginInjector;
-	boolean isToolbarVisible, changingSelection; //canDelete
+	boolean isToolbarVisible, changingSelection;
 	List<UserBadgeItem> users;
 	SynapseSuggestBox peopleSuggestWidget;	
 	Callback selectionChangedCallback;
