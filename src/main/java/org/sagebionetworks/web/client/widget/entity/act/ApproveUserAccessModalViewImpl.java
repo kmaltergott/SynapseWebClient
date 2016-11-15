@@ -47,6 +47,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	TextArea messageEditArea;
 	@UiField
+	Div userListContainer;
+	@UiField
 	Div userSelectContainer;
 	@UiField
 	Div loadingEmail;
@@ -131,6 +133,12 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	public void setUserPickerWidget(Widget w) {
 		userSelectContainer.clear();
 		userSelectContainer.add(w);
+	}
+	
+	@Override
+	public void setUserListWidget(Widget w) {
+		userListContainer.clear();
+		userListContainer.add(w);
 	}
 	
 	@Override

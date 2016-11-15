@@ -32,9 +32,10 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	
 	Widget widget;
 	
-	String fileHandleId;
+	String userId;
 	Callback selectionChangedCallback;
 	PortalGinInjector portalGinInjector;
+
 	@Inject
 	public UserBadgeItem(UserBadgeItemUiBinder binder,
 			PortalGinInjector portalGinInjector) {
@@ -51,8 +52,9 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	}
 	
 	public UserBadgeItem configure(String ownerId) {
+		userId = ownerId;
 		UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
-		userBadge.configure(ownerId);
+		userBadge.configure(userId);
 		userBadge.setSize(BadgeSize.SMALL);
 		userBadge.setCustomClickHandler(new ClickHandler() {
 			@Override
@@ -88,6 +90,10 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	
 	public void setSelectVisible(boolean visible) {
 		select.setVisible(visible);
+	}
+	
+	public String getUserId() {
+		return userId;
 	}
 	
 	@Override
