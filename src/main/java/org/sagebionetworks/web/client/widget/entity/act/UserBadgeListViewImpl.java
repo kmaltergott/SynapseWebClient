@@ -3,14 +3,11 @@ package org.sagebionetworks.web.client.widget.entity.act;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -71,19 +68,16 @@ public class UserBadgeListViewImpl implements UserBadgeListView {
 		userSelectorContainer.add(widget);
 	}
 	
-	@Override
 	public void setUploadWidgetVisible(boolean visible) {
 		userSelectorContainer.setVisible(visible);
 	}
 	@Override
-	public void addUserBadge(String userId) {
-		HTML ta = new HTML();
-		ta.setHTML(userId);
-		userBadgeContainer.add(ta.asWidget());
+	public void addUserBadge(Widget user) {
+		userBadgeContainer.add(user.asWidget());
 	}
 	
 	@Override
-	public void clearFileLinks() {
+	public void clearUserBadges() {
 		userBadgeContainer.clear();		
 	}
 	

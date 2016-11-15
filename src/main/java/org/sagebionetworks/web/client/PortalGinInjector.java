@@ -60,6 +60,7 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
+import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -158,6 +159,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEd
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
@@ -331,6 +336,7 @@ public interface PortalGinInjector extends Ginjector {
 	
 	// Other widgets
 	public UserBadge getUserBadgeWidget();
+	public UserBadgeItem getUserBadgeItem();
 	public VersionTimer getVersionTimer();
 	public Md5Link getMd5Link();
 	public QuestionContainerWidget getQuestionContainerWidget();
@@ -425,4 +431,8 @@ public interface PortalGinInjector extends Ginjector {
 	public RadioWidget createNewRadioWidget();
 	public EntityListRowBadge getEntityListRowBadge();
 	public CancelControlWidget getCancelControlWidget();
+	public FacetColumnResultSliderRangeWidget getFacetColumnResultSliderRangeWidget();
+	public FacetColumnResultRangeWidget getFacetColumnResultRangeWidget();
+	public FacetColumnResultValuesWidget getFacetColumnResultValuesWidget();
+	public FacetColumnResultDateRangeWidget getFacetColumnResultDateRangeWidget();
 }
