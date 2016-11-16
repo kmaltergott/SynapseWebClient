@@ -203,54 +203,30 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	
 	@Override
 	public void onRevoke() {
+		userIds = userBadgeList.getUserIds();
 		if (userIds == null || userIds.isEmpty()) {
 			synAlert.showError(NO_USER_SELECTED);
 			return;
 		}
 		accessRequirement = view.getAccessRequirement();
 		view.setRevokeProcessing(true);
-		synapseClient.getEntityAccessApproval(datasetId, new AsyncCallback<PaginatedResults<AccessApproval>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-				view.setRevokeProcessing(false);
-			}
-
-			@Override
-			public void onSuccess(PaginatedResults<AccessApproval> result) {
-//				List<AccessApproval> results = result.getResults();
-//				Long accessReq = Long.parseLong(accessRequirement);
-//				for (AccessApproval approval : results) {
-//					if (approval.getAccessorId().equals(userId) && approval.getRequirementId().equals(accessReq)) {
-//						removeAccess(approval.getId());
-//						return;
-//					}
-//				}
-//				//no AccessApproval was found for this user
-//				view.setRevokeProcessing(false);
-//				synAlert.showError(NO_APPROVAL_FOUND);
-			}
-		});
-	}
-
-	private void removeAccess(Long id) {
-		synapseClient.deleteAccessApproval(id, new AsyncCallback<Void>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-				view.setRevokeProcessing(false);
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				view.setRevokeProcessing(false);
-				view.hide();
-				view.showInfo(REVOKED_USER, "");
-			}
-		});
-		
+		for (int i = 0; i < userIds.size(); i++) {
+			synapseClient.deleteAccessApprovals(accessRequirement, userIds.get(i), new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+					view.setRevokeProcessing(false);
+				}
+				
+				//not quite working yet - need a way to execute part of requests in order
+				@Override
+				public void onSuccess(Void result) {
+					view.setRevokeProcessing(false);
+					view.hide();
+					view.showInfo(REVOKED_USER, "");
+				}
+			}); 
+		}
 	}
 	
 	@Override
