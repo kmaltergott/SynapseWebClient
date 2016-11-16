@@ -35,5 +35,6 @@ public interface ApproveUserAccessModalView extends IsWidget {
 		void onStateSelected(String state);
 		void onRevoke();
 	}
+	void setUserListWidget(Widget asWidget);
 
 }

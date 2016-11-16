@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,43 +22,24 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	UserBadgeListView view;
 	PortalGinInjector ginInjector;
 	boolean isToolbarVisible, changingSelection;
-	List<UserBadgeItem> users;
-	SynapseSuggestBox peopleSuggestWidget;	
+	List<UserBadgeItem> users;	
 	Callback selectionChangedCallback;
 	
 	@Inject
 	public UserBadgeList (
-			SynapseSuggestBox peopleSuggestBox,
-			UserGroupSuggestionProvider provider, 
 			UserBadgeListView view, 
 			PortalGinInjector ginInjector) {
 		super();
 		this.view = view;
-		this.peopleSuggestWidget = peopleSuggestBox;
-		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
-		this.view.setSelectorWidget(peopleSuggestWidget.asWidget());
 		users = new ArrayList<UserBadgeItem>();
-		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
-			@Override
-			public void invoke(SynapseSuggestion suggestion) {
-				onUserSelected(suggestion);
-			}
-		});
 		selectionChangedCallback = new Callback() {
 			@Override
 			public void invoke() {
-				refreshLinkUI();
+				refreshListUI();
 			}
-		};
-		
-	}
-	
-	public void onUserSelected(SynapseSuggestion suggestion) {
-		addUserBadge(suggestion.getId());
-		peopleSuggestWidget.clear();
-		refreshLinkUI();
+		};	
 	}
 	
 	public UserBadgeList configure(){
@@ -84,7 +66,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		view.addUserBadge(item.asWidget());
 	}
 	
-	public void refreshLinkUI() {
+	public void refreshListUI() {
 		view.clearUserBadges();
 		for (UserBadgeItem item : users) {
 			view.addUserBadge(item.asWidget());
@@ -99,7 +81,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	
 	@Override
 	public void deleteSelected() {
-		//remove all selected file links
+		//remove all selected users
 		Iterator<UserBadgeItem> it = users.iterator();
 		while(it.hasNext()){
 			UserBadgeItem row = it.next();
@@ -107,7 +89,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 				it.remove();
 			}
 		}
-		refreshLinkUI();
+		refreshListUI();
 	}
 	
 	/**
@@ -158,8 +140,11 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	}
 
 	@Override
-	public List<String> getUserBadges() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<String> getUserIds() {
+		List<String> userIds = new ArrayList<String>();
+		for (UserBadgeItem item : users) {
+			userIds.add(item.getUserId());
+		}
+		return userIds;
 	}
 }

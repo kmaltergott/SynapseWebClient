@@ -47,8 +47,8 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String QUERY_CANCELLED = "Query cancelled";
 	public static final String NO_EMAIL_MESSAGE = "You must enter an email to send to the user";
 	public static final String NO_USER_SELECTED = "You must select a user to approve";
-	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "User has been approved, but an error was encountered while emailing them: ";
-	public static final String APPROVED_USER = "Successfully Approved User";
+	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "Users have been approved, but an error was encountered while emailing them: ";
+	public static final String APPROVED_USER = "Successfully Approved Users";
 	public static final String REVOKED_USER = "Successfully Revoked User Access";
 	public static final String EMAIL_SENT = "An email has been sent to notify them";
 	public static final String MESSAGE_BLANK = "You must enter an email message to approve this user";
@@ -58,10 +58,14 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private static final Long ALL_PARTS_MASK = new Long(255);
 	
 	private String accessRequirement;
-	private String userId;
 	private String datasetId;
 	private String message;
 	private EntityBundle entityBundle;
+	private List<String> userIds;
+	private int completed;
+	private int target;
+
+	Set<String> recipients = new HashSet<String>();
 	
 	private ApproveUserAccessModalView view;
 	private SynapseAlert synAlert;
@@ -70,6 +74,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private JobTrackingWidget progressWidget;
+	private UserBadgeList userBadgeList;
 	
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
@@ -86,9 +91,11 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.progressWidget = progressWidget;
+		this.userBadgeList = userBadgeList;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
-		this.view.setUserPickerWidget(userBadgeList.setCanDelete(true).asWidget());
+		this.view.setUserListWidget(userBadgeList.setCanDelete(true).asWidget());
+		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
 		view.setLoadingEmailWidget(this.progressWidget.asWidget());
 		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			@Override
@@ -99,6 +106,8 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 
 	public void configure(List<ACTAccessRequirement> accessRequirements, EntityBundle bundle) {
+		completed = 0; //for knowing when to send email
+		target = 0; //when approving/revoking access
 		view.startLoadingEmail();
 		this.entityBundle = bundle;
 		this.arMap = new HashMap<String, AccessRequirement>();
@@ -194,7 +203,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	
 	@Override
 	public void onRevoke() {
-		if (userId == null) {
+		if (userIds == null || userIds.isEmpty()) {
 			synAlert.showError(NO_USER_SELECTED);
 			return;
 		}
@@ -210,17 +219,17 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 
 			@Override
 			public void onSuccess(PaginatedResults<AccessApproval> result) {
-				List<AccessApproval> results = result.getResults();
-				Long accessReq = Long.parseLong(accessRequirement);
-				for (AccessApproval approval : results) {
-					if (approval.getAccessorId().equals(userId) && approval.getRequirementId().equals(accessReq)) {
-						removeAccess(approval.getId());
-						return;
-					}
-				}
-				//no AccessApproval was found for this user
-				view.setRevokeProcessing(false);
-				synAlert.showError(NO_APPROVAL_FOUND);
+//				List<AccessApproval> results = result.getResults();
+//				Long accessReq = Long.parseLong(accessRequirement);
+//				for (AccessApproval approval : results) {
+//					if (approval.getAccessorId().equals(userId) && approval.getRequirementId().equals(accessReq)) {
+//						removeAccess(approval.getId());
+//						return;
+//					}
+//				}
+//				//no AccessApproval was found for this user
+//				view.setRevokeProcessing(false);
+//				synAlert.showError(NO_APPROVAL_FOUND);
 			}
 		});
 	}
@@ -246,7 +255,8 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	
 	@Override
 	public void onSubmit() {
-		if (userId == null) {
+		userIds = userBadgeList.getUserIds();
+		if (userIds == null || userIds.isEmpty()) {
 			synAlert.showError(NO_USER_SELECTED);
 			return;
 		}
@@ -255,49 +265,64 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			synAlert.showError(MESSAGE_BLANK);
 			return;
 		}
+		recipients.clear();
+		completed = 0;
+		target = userIds.size();
 		accessRequirement = view.getAccessRequirement();
 		view.setApproveProcessing(true);
-		ACTAccessApproval aa  = new ACTAccessApproval();
-		aa.setAccessorId(userId);  //user id
+		ACTAccessApproval aa = new ACTAccessApproval();
 		aa.setApprovalStatus(ACTApprovalStatus.APPROVED);
 		aa.setRequirementId(Long.parseLong(accessRequirement)); //requirement id
-		synapseClient.createAccessApproval(aa, new AsyncCallback<AccessApproval>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-				view.setApproveProcessing(false);
-			}
-
-			@Override
-			public void onSuccess(AccessApproval result) {
-				sendEmail(result);						
-			}
-		});
-	}
+		for (int i = 0; i < userIds.size(); i++) {
+			aa.setAccessorId(userIds.get(i));  //user id
+			synapseClient.createAccessApproval(aa, new AsyncCallback<AccessApproval>() {
 	
-	private void sendEmail(AccessApproval result) {
-		Set<String> recipients = new HashSet<String>();
-		recipients.add(userId);
-		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					completed++;
+					// add failed userId to list ?
+					synAlert.handleException(caught); //somewhere other than synalert? will get overwritten if multiple failures in a row
+					if (completed == target) {
+						sendEmail();
+					}
+				}
+	
+				@Override
+				public void onSuccess(AccessApproval result) {
+					completed++;
+					recipients.add(result.getAccessorId());
+					// add user id to set of recipient ids - only send email after for loop finishes
+					if (completed == target) {
+						sendEmail();
+					}
+				}
+			});
+		}
+	}
+		
+	private void sendEmail() {
+		if (recipients.size() > 0) {
+			synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setApproveProcessing(false);
-				synAlert.showError(APPROVE_BUT_FAIL_TO_EMAIL + caught.getMessage());
-			}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.setApproveProcessing(false);
+					synAlert.showError(APPROVE_BUT_FAIL_TO_EMAIL + caught.getMessage());
+				}
 
-			@Override
-			public void onSuccess(String result) {
-				view.setApproveProcessing(false);
-				view.hide();
-				view.showInfo(APPROVED_USER, EMAIL_SENT);
-			}
-		});
+				@Override
+				public void onSuccess(String result) {
+					view.setApproveProcessing(false);
+					view.hide();
+					view.showInfo(APPROVED_USER, EMAIL_SENT);
+				}
+			});			
+		}
 	}
 	
 	public void onUserSelected(SynapseSuggestion suggestion) {
-		this.userId = suggestion.getId();
+		userBadgeList.addUserBadge(suggestion.getId());
+		peopleSuggestWidget.clear();
 	}
 	
 	public Widget asWidget() {
