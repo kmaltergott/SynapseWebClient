@@ -6,11 +6,6 @@ import java.util.List;
 
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -55,15 +50,19 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	 */
 	public UserBadgeList setCanDelete(boolean canDelete) {
 		this.isToolbarVisible = canDelete;
-		view.setToolbarVisible(isToolbarVisible);
+		boolean toolbarVisible = isToolbarVisible && users.size() > 0;
+		view.setToolbarVisible(toolbarVisible);
 		return this;
 	}
 	
 	public void addUserBadge(String userId) {
 		UserBadgeItem item = ginInjector.getUserBadgeItem();
-		item.configure(userId).setSelectionChangedCallback(selectionChangedCallback);
+		item.configure(userId);
+		item.setSelectionChangedCallback(selectionChangedCallback);
 		users.add(item);
 		view.addUserBadge(item.asWidget());
+		boolean toolbarVisible = isToolbarVisible && users.size() > 0;
+		view.setToolbarVisible(toolbarVisible);
 	}
 	
 	public void refreshListUI() {
