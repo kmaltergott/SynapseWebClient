@@ -347,7 +347,6 @@ public interface PortalGinInjector extends Ginjector {
 	public URLProvEntryView getURLEntry();
 	public ProvenanceListWidget getProvenanceListWidget();
 	public PreviewWidget getPreviewWidget();
-	public UserBadgeItem getUserBadgeItem();
 	
 	// TableEntity V2
 	public ColumnModelsView createNewColumnModelsView();
