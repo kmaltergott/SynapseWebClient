@@ -41,14 +41,14 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		this.isToolbarVisible = false;
 		view.setToolbarVisible(false);
 		return this;
-	};
+	}
 	
 	public UserBadgeList configure(List<String> users) {
 		for (String user : users) {
 			addUserBadge(user);
 		}
 		return this;
-	}
+	};
 	
 	/**
 	 * If true then show toolbar with the delete button.

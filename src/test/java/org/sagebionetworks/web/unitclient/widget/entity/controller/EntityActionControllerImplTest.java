@@ -199,7 +199,7 @@ public class EntityActionControllerImplTest {
 				mockRenameEntityModalWidget, mockEditFileMetadataModalWidget, mockEditProjectMetadataModalWidget,
 				mockEntityFinder, mockSubmitter, mockUploader,
 				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget,
-				mockEvalEditor, mockCookies, mockChallengeClient, mockSelectTeamModal, mockApproveUserAccessModal, mockUserProfileClient);
+				mockEvalEditor, mockCookies, mockChallengeClient, mockSelectTeamModal, mockApproveUserAccessModal, null, mockUserProfileClient);
 		
 		parentId = "syn456";
 		entityId = "syn123";
