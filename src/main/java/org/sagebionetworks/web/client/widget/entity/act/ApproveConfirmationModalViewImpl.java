@@ -179,4 +179,10 @@ public class ApproveConfirmationModalViewImpl implements ApproveConfirmationModa
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public void setUserListWidget(Widget w) {
+		usersContainer.clear();
+		usersContainer.add(w.asWidget());
+	}
 }

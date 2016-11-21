@@ -16,7 +16,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 
 	UserBadgeListView view;
 	PortalGinInjector ginInjector;
-	boolean isToolbarVisible, changingSelection;
+	boolean isToolbarVisible, changingSelection, canSelect;
 	List<UserBadgeItem> users;	
 	Callback selectionChangedCallback;
 	
@@ -37,13 +37,16 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		};	
 	}
 	
-	public UserBadgeList configure(){
-		this.isToolbarVisible = false;
-		view.setToolbarVisible(false);
+	public UserBadgeList configure(boolean canSelect, boolean canDelete){
+		this.isToolbarVisible = canDelete;
+		view.setToolbarVisible(canDelete && users.size() > 0);
+		this.canSelect = canSelect;
 		return this;
 	}
 	
-	public UserBadgeList configure(List<String> users) {
+	public UserBadgeList configure(List<String> users, boolean canSelect, boolean canDelete) {
+		this.users.clear();
+		this.view.clearUserBadges();
 		for (String user : users) {
 			addUserBadge(user);
 		}
@@ -66,6 +69,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		UserBadgeItem item = ginInjector.getUserBadgeItem();
 		item.configure(userId);
 		item.setSelectionChangedCallback(selectionChangedCallback);
+		item.setSelectVisible(canSelect);
 		users.add(item);
 		view.addUserBadge(item.asWidget());
 		boolean toolbarVisible = isToolbarVisible && users.size() > 0;

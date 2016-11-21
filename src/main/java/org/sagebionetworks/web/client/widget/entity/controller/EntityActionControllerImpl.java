@@ -706,7 +706,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void onApproveUserAccess() {
 		List<String> users = new ArrayList<String>();
-		users.add(authenticationController.getCurrentUserPrincipalId());
+		users.add("345424");
+		users.add("3345921");
 		approveConfirmationModal.show();
 		approveConfirmationModal.configure(actRequirements.get(0), users, entityBundle);
 		

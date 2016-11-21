@@ -73,7 +73,7 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 		this.globalApplicationState = globalApplicationState;
 		this.progressWidget = progressWidget;
 		this.userBadgeList = userBadgeList;
-		
+		this.view.setUserListWidget(userBadgeList.asWidget());
 		this.view.setPresenter(this);
 		view.setLoadingEmailWidget(this.progressWidget.asWidget());
 	}
@@ -83,7 +83,7 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 		this.entityBundle = bundle;
 		this.accessRequirement = accessRequirement.getId();
 		view.setSynAlert(synAlert.asWidget());
-		userBadgeList.configure(users);
+		userBadgeList.configure(users, true, true);
 		datasetId = entityBundle.getEntity().getId(); //get synId of dataset we are currently on
 		loadEmailMessage();
 	}
