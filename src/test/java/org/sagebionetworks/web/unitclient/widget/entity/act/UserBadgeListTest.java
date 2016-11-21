@@ -8,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -53,6 +54,16 @@ public class UserBadgeListTest {
 		list.configure();
 		verify(mockView).setToolbarVisible(false);
 	}	
+	
+	@Test
+	public void testConfigureList() {
+		List<String> users = new ArrayList<String>();
+		users.add(userId);
+		users.add(userId2);
+		list.configure(users);
+		verify(mockGinInjector, times(2)).getUserBadgeItem();
+		verify(mockView, times(2)).addUserBadge(any(Widget.class));
+	}
 	
 	@Test
 	public void testAddUser() {
