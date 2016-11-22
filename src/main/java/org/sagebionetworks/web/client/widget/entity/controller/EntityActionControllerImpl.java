@@ -708,8 +708,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		List<String> users = new ArrayList<String>();
 		users.add("345424");
 		users.add("3345921");
-		approveConfirmationModal.show();
 		approveConfirmationModal.configure(actRequirements.get(0), users, entityBundle);
+		approveConfirmationModal.show();
 		
 //		approveUserAccessModal.configure(actRequirements, entityBundle);
 //		approveUserAccessModal.show();
