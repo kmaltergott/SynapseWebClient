@@ -30,5 +30,6 @@ public interface ApproveConfirmationModalView extends IsWidget {
 	String getAccessRequirement();
 	String getEmailMessage();
 	Widget getEmailBodyWidget(String html);
+	void setAccessReqNumber(Long num);
 
 }

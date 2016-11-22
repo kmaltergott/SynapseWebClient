@@ -5,6 +5,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -24,10 +25,14 @@ public class ApproveConfirmationModalViewImpl implements ApproveConfirmationModa
 	public interface Binder extends UiBinder<Widget, ApproveConfirmationModalViewImpl> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
 	
+	public static final String ACCESS_REQ_STR = "Access Requirement: ";
+	
 	@UiField
 	Modal modal;
 	@UiField
 	HTML accessReqText;
+	@UiField
+	Heading accessReqNum;
 	@UiField
 	Div synAlertContainer;
 	@UiField
@@ -92,6 +97,10 @@ public class ApproveConfirmationModalViewImpl implements ApproveConfirmationModa
 		this.presenter = presenter;
 	}
 	
+	@Override
+	public void setAccessReqNumber(Long num) {
+		accessReqNum.setText(ACCESS_REQ_STR + Long.toString(num));
+	}
 	
 	@Override
 	public void setLoadingEmailWidget(Widget w) {

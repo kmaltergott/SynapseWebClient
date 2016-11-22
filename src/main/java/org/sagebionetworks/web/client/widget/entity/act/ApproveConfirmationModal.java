@@ -81,6 +81,7 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 		view.startLoadingEmail();
 		this.entityBundle = bundle;
 		this.accessRequirement = accessRequirement.getId();
+		view.setAccessReqNumber(this.accessRequirement);
 		view.setAccessRequirement(GovernanceServiceHelper.getAccessRequirementText(accessRequirement));
 		view.setSynAlert(synAlert.asWidget());
 		userBadgeList.configure(users, true, true);
