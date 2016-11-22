@@ -8,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -46,17 +47,27 @@ public class UserBadgeListTest {
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem);
 		when(mockUserBadgeItem.getUserId()).thenReturn(userId);
 		when(mockUserBadgeItem2.getUserId()).thenReturn(userId2);
+
+		list.configure(true, true);
 	}
 	
 	@Test
 	public void testConfigure() {
-		list.configure();
 		verify(mockView).setToolbarVisible(false);
 	}	
 	
 	@Test
+	public void testConfigureList() {
+		List<String> users = new ArrayList<String>();
+		users.add(userId);
+		users.add(userId2);
+		list.configure(users, true, true);
+		verify(mockGinInjector, times(2)).getUserBadgeItem();
+		verify(mockView, times(2)).addUserBadge(any(Widget.class));
+	}
+	
+	@Test
 	public void testAddUser() {
-		list.configure();
 		list.addUserBadge(userId);
 		verify(mockGinInjector).getUserBadgeItem();
 		verify(mockView).addUserBadge(any(Widget.class));
@@ -64,29 +75,25 @@ public class UserBadgeListTest {
 	
 	@Test
 	public void testSetDeleteTrueNoUsers() {
-		list.configure();
 		list.setCanDelete(true);
 		verify(mockView, times(2)).setToolbarVisible(false);
 	}
 	
 	@Test
 	public void testSetDeleteTrueWithUsers() {
-		list.configure();
 		list.addUserBadge(userId);
 		list.setCanDelete(true);
-		verify(mockView).setToolbarVisible(true);
+		verify(mockView, times(2)).setToolbarVisible(true);
 	}
 	
 	@Test
 	public void testSetDeleteFalseWithUsers() {
-		list.configure();
 		list.setCanDelete(false);
 		verify(mockView, times(2)).setToolbarVisible(false);	
 	}
 	
 	@Test
 	public void testRefreshListUIWithUser() {
-		list.configure();
 		list.addUserBadge(userId);
 		list.refreshListUI();
 		verify(mockView).clearUserBadges();
@@ -95,7 +102,6 @@ public class UserBadgeListTest {
 	
 	@Test
 	public void testRefreshListUINoUsers() {
-		list.configure();
 		list.refreshListUI();
 		verify(mockView).clearUserBadges();
 		verify(mockView, times(0)).addUserBadge(any(Widget.class));
@@ -103,7 +109,6 @@ public class UserBadgeListTest {
 	
 	@Test
 	public void testDeleteSelected() {
-		list.configure();
 		list.addUserBadge(userId);
 		when(mockUserBadgeItem.isSelected()).thenReturn(true);
 		list.deleteSelected();
@@ -113,7 +118,6 @@ public class UserBadgeListTest {
 	
 	@Test
 	public void testDeleteSelectedMultiple() {
-		list.configure();
 		when(mockUserBadgeItem.isSelected()).thenReturn(true);
 		when(mockUserBadgeItem2.isSelected()).thenReturn(false);
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem, mockUserBadgeItem2);
@@ -128,7 +132,6 @@ public class UserBadgeListTest {
 	
 	@Test
 	public void testCheckSelectionStateSelected() {
-		list.configure();
 		when(mockUserBadgeItem.isSelected()).thenReturn(true);
 		list.setCanDelete(true);
 		list.addUserBadge(userId);
@@ -138,7 +141,6 @@ public class UserBadgeListTest {
 	
 	@Test
 	public void testCheckSelectionStateNotSelected() {
-		list.configure();
 		when(mockUserBadgeItem.isSelected()).thenReturn(false);
 		list.setCanDelete(true);
 		list.addUserBadge(userId);
@@ -148,7 +150,6 @@ public class UserBadgeListTest {
 	
 	@Test
 	public void testGetUserIds() {
-		list.configure();
 		list.addUserBadge(userId);
 		List<String> userIdList = list.getUserIds();
 		assertTrue(userIdList.size() == 1);
@@ -157,7 +158,6 @@ public class UserBadgeListTest {
 	
 	@Test
 	public void testGetUserIdsAfterDeleting() {
-		list.configure();
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem, mockUserBadgeItem2);
 		when(mockUserBadgeItem.isSelected()).thenReturn(true);
 		when(mockUserBadgeItem2.isSelected()).thenReturn(false);
@@ -172,7 +172,6 @@ public class UserBadgeListTest {
 
 	@Test
 	public void testSelectAll() {
-		list.configure();
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem, mockUserBadgeItem2);
 		list.addUserBadge(userId);
 		list.addUserBadge(userId2);
@@ -183,7 +182,6 @@ public class UserBadgeListTest {
 	
 	@Test
 	public void testSelectNone() {
-		list.configure();
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem, mockUserBadgeItem2);
 		list.addUserBadge(userId);
 		list.addUserBadge(userId2);

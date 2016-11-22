@@ -225,6 +225,8 @@ import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorView;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.act.ApproveConfirmationModalView;
+import org.sagebionetworks.web.client.widget.entity.act.ApproveConfirmationModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalViewImpl;
@@ -1364,6 +1366,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);
 		bind(SelectTeamModalView.class).to(SelectTeamModalViewImpl.class);
 		bind(ApproveUserAccessModalView.class).to(ApproveUserAccessModalViewImpl.class);
+		bind(ApproveConfirmationModalView.class).to(ApproveConfirmationModalViewImpl.class);
 		bind(UserBadgeListView.class).to(UserBadgeListViewImpl.class);
 		bind(EntityListRowBadgeView.class).to(EntityListRowBadgeViewImpl.class);
 		

@@ -46,6 +46,7 @@ import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
+import org.sagebionetworks.web.client.widget.entity.act.ApproveConfirmationModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -124,6 +125,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
 	ApproveUserAccessModal approveUserAccessModal;
+	ApproveConfirmationModal approveConfirmationModal;
 	UserProfileClientAsync userProfileClient;
 	
 	@Inject
@@ -147,6 +149,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			ChallengeClientAsync challengeClient,
 			SelectTeamModal selectTeamModal,
 			ApproveUserAccessModal approveUserAccessModal,
+			ApproveConfirmationModal approveConfirmationModal,
 			UserProfileClientAsync userProfileClient) {
 		super();
 		this.view = view;
@@ -182,6 +185,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 		this.selectTeamModal = selectTeamModal;
 		this.approveUserAccessModal = approveUserAccessModal;
+		this.approveConfirmationModal = approveConfirmationModal;
 		this.userProfileClient = userProfileClient;
 		this.actRequirements = new ArrayList<ACTAccessRequirement>();
 	}
@@ -701,8 +705,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	
 	private void onApproveUserAccess() {
-		approveUserAccessModal.configure(actRequirements, entityBundle);
-		approveUserAccessModal.show();
+		List<String> users = new ArrayList<String>();
+		users.add("345424");
+		users.add("3345921");
+		approveConfirmationModal.show();
+		approveConfirmationModal.configure(actRequirements.get(0), users, entityBundle);
+		
+//		approveUserAccessModal.configure(actRequirements, entityBundle);
+//		approveUserAccessModal.show();
 	}
 	
 
