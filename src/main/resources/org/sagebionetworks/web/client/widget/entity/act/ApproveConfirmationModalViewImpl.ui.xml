@@ -22,9 +22,8 @@
 		<b:Modal ui:field="modal" title="Approve Access Request" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
 			<b:ModalBody>
 				<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
-					<b:Heading size="H5" text="Access Requirement" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
-					<b:Heading size="H5" text="Access Requirement Text" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
-					<g:HTML ui:field="accessReqText" width="100%" addStyleNames="read-only-box min-height-100"/>
+					<b:Heading size="H5" text="Access Requirement: " addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
+					<g:HTML ui:field="accessReqText" width="100%" addStyleNames="read-only-box"/>
 				</bh:Div>
 				<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
 					<b:Heading size="H5" text="Users" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
