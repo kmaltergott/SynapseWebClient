@@ -147,7 +147,7 @@ public class ApproveConfirmationModalViewImpl implements ApproveConfirmationModa
 	}
 	
 	@Override
-	public void setAccessRequirement(String num, String html) {
+	public void setAccessRequirement(String html) {
 		accessReqText.setHTML(html);
 	}
 

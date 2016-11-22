@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
@@ -82,6 +83,7 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 		view.startLoadingEmail();
 		this.entityBundle = bundle;
 		this.accessRequirement = accessRequirement.getId();
+		view.setAccessRequirement(GovernanceServiceHelper.getAccessRequirementText(accessRequirement));
 		view.setSynAlert(synAlert.asWidget());
 		userBadgeList.configure(users, true, true);
 		datasetId = entityBundle.getEntity().getId(); //get synId of dataset we are currently on
