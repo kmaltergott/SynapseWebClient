@@ -51,6 +51,7 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 	private String datasetId;
 	private String message;
 	private EntityBundle entityBundle;
+	private boolean approve;
 	
 	private ApproveConfirmationModalView view;
 	private SynapseAlert synAlert;
@@ -77,8 +78,13 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 		view.setLoadingEmailWidget(this.progressWidget.asWidget());
 	}
 
-	public void configure(ACTAccessRequirement accessRequirement, List<String> users, EntityBundle bundle) {
-		view.startLoadingEmail();
+	public void configure(ACTAccessRequirement accessRequirement, List<String> users, EntityBundle bundle, boolean approve) {
+		this.approve = approve;
+		view.setState(approve);
+		if (approve) {
+			view.startLoadingEmail();
+			loadEmailMessage();
+		}
 		this.entityBundle = bundle;
 		this.accessRequirement = accessRequirement.getId();
 		view.setAccessReqNumber(this.accessRequirement);
@@ -86,7 +92,6 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 		view.setSynAlert(synAlert.asWidget());
 		userBadgeList.configure(users, true, true);
 		datasetId = entityBundle.getEntity().getId(); //get synId of dataset we are currently on
-		loadEmailMessage();
 	}
 	
 	private void loadEmailMessage() {

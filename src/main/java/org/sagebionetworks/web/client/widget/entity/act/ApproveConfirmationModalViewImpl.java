@@ -26,6 +26,8 @@ public class ApproveConfirmationModalViewImpl implements ApproveConfirmationModa
 	private static Binder uiBinder = GWT.create(Binder.class);
 	
 	public static final String ACCESS_REQ_STR = "Access Requirement: ";
+	public static final String REJECT_TITLE = "Reject Access Request";
+	public static final String APPROVE_TITLE = "Approve Access Request";
 	
 	@UiField
 	Modal modal;
@@ -85,6 +87,15 @@ public class ApproveConfirmationModalViewImpl implements ApproveConfirmationModa
 				previewModal.hide();		
 			}		
 		});
+	}
+	
+	@Override
+	public void setState(boolean approve) {
+		if (approve) {
+			modal.setTitle(APPROVE_TITLE);
+		} else {
+			modal.setTitle(REJECT_TITLE);
+		}
 	}
 	
 	@Override
