@@ -115,6 +115,7 @@ public class ApproveConfirmationModalViewImpl implements ApproveConfirmationModa
 	
 	@Override
 	public void setLoadingEmailWidget(Widget w) {
+		loadingEmail.clear();
 		loadingEmail.add(w.asWidget());
 	}
 	
