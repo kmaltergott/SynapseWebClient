@@ -175,9 +175,17 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 			synAlert.showError(MESSAGE_BLANK);
 			return;
 		}
-		view.setApproveProcessing(true);
+		view.setProcessing(true);
+		if (approve) {
+			approveRequest();
+		} else {
+			rejectRequest();
+		}
+	}
+	
+	private void approveRequest() {
 		ACTAccessApproval aa  = new ACTAccessApproval();
-		aa.setAccessorId(userId);  //user id
+		aa.setAccessorId("3345921");  //user id - mine for now; eventually will be a list of users
 		aa.setApprovalStatus(ACTApprovalStatus.APPROVED);
 		aa.setRequirementId(accessRequirement);
 		synapseClient.createAccessApproval(aa, new AsyncCallback<AccessApproval>() {
@@ -185,7 +193,30 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
-				view.setApproveProcessing(false);
+				view.setProcessing(false);
+			}
+
+			@Override
+			public void onSuccess(AccessApproval result) {
+				sendEmail(result);						
+			}
+		});
+	}
+	
+	private void rejectRequest() {
+		ACTAccessApproval aa  = new ACTAccessApproval();
+		aa.setAccessorId("3345921");  //user id - mine for now; eventually will be a list of users
+		aa.setApprovalStatus(ACTApprovalStatus.PENDING);
+		aa.setRequirementId(accessRequirement);
+		
+		//eventually will have a deleteAccessApproval method in synapseClient
+		
+		synapseClient.createAccessApproval(aa, new AsyncCallback<AccessApproval>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+				view.setProcessing(false);
 			}
 
 			@Override
@@ -202,13 +233,13 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setApproveProcessing(false);
+				view.setProcessing(false);
 				synAlert.showError(APPROVE_BUT_FAIL_TO_EMAIL + caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(String result) {
-				view.setApproveProcessing(false);
+				view.setProcessing(false);
 				view.hide();
 				view.showInfo(APPROVED_USER, EMAIL_SENT);
 			}

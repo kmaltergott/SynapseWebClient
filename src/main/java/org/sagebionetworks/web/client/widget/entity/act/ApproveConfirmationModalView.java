@@ -11,7 +11,7 @@ public interface ApproveConfirmationModalView extends IsWidget {
 	void setSynAlert(Widget asWidget);
 	void setLoadingEmailWidget(Widget w);
 	void setAccessRequirement(String html);
-	void setApproveProcessing(boolean processing);
+	void setProcessing(boolean processing);
 	void setMessageBody(String html);
 	void setMessageEditArea(String html);
 	void setUserListWidget(Widget asWidget);

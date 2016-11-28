@@ -158,7 +158,7 @@ public class ApproveConfirmationModalViewImpl implements ApproveConfirmationModa
 	}
 
 	@Override
-	public void setApproveProcessing(boolean processing) {
+	public void setProcessing(boolean processing) {
 		if(processing){
 			submitButton.state().loading();
 		}else{
