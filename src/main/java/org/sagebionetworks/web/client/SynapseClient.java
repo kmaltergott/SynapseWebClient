@@ -553,4 +553,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	void deleteAccessApproval(Long approvalId) throws RestServiceException;
 	PaginatedResults<AccessApproval> getEntityAccessApproval(String entityId) throws RestServiceException;
 
+	void deleteAccessApprovals(String requirementId, String accessorId) throws RestServiceException;
+
 }
