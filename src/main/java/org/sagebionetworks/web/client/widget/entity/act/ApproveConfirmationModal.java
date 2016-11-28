@@ -82,11 +82,6 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 		this.approve = approve;
 		this.users = new HashSet<String>(users);
 		view.setState(approve);
-		if (approve) {
-			view.setLoadingEmailWidget(this.progressWidget.asWidget());
-			view.startLoadingEmail();
-			loadEmailMessage();
-		}
 		this.userId = "3345921";
 		this.entityBundle = bundle;
 		this.accessRequirement = accessRequirement.getId();
@@ -95,6 +90,11 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 		view.setSynAlert(synAlert.asWidget());
 		userBadgeList.configure(users, true, true);
 		datasetId = entityBundle.getEntity().getId(); //get synId of dataset we are currently on
+		if (approve) {
+			view.setLoadingEmailWidget(this.progressWidget.asWidget());
+			view.startLoadingEmail();
+			loadEmailMessage();
+		}
 	}
 	
 	private void loadEmailMessage() {
