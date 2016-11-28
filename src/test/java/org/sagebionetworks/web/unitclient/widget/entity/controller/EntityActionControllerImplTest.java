@@ -83,6 +83,7 @@ import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
+import org.sagebionetworks.web.client.widget.entity.act.ApproveConfirmationModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -157,6 +158,8 @@ public class EntityActionControllerImplTest {
 	@Mock
 	ApproveUserAccessModal mockApproveUserAccessModal;
 	@Mock
+	ApproveConfirmationModal mockApproveConfirmationModal;
+	@Mock
 	UserProfileClientAsync mockUserProfileClient;
 	@Captor
 	ArgumentCaptor<AsyncCallback<UserBundle>> userBundleCaptor;
@@ -201,7 +204,7 @@ public class EntityActionControllerImplTest {
 				mockRenameEntityModalWidget, mockEditFileMetadataModalWidget, mockEditProjectMetadataModalWidget,
 				mockEntityFinder, mockSubmitter, mockUploader,
 				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget,
-				mockEvalEditor, mockCookies, mockChallengeClient, mockSelectTeamModal, mockApproveUserAccessModal, null, mockUserProfileClient);
+				mockEvalEditor, mockCookies, mockChallengeClient, mockSelectTeamModal, mockApproveUserAccessModal, mockApproveConfirmationModal, mockUserProfileClient);
 		
 		parentId = "syn456";
 		entityId = "syn123";
@@ -637,9 +640,15 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testOnSelectApproveUserAccess(){
+		ACTAccessRequirement accReq = new ACTAccessRequirement();
+		accessReqs.add(accReq);
+		List<ACTAccessRequirement> actList = new LinkedList<ACTAccessRequirement>();
+		actList.add(accReq);
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		controller.onAction(Action.APPROVE_USER_ACCESS);
-		verify(mockApproveUserAccessModal).configure(new LinkedList<ACTAccessRequirement>(), entityBundle);
+		verify(mockApproveConfirmationModal).configure(eq(accReq), any(List.class), eq(entityBundle), eq(false));
+		verify(mockApproveConfirmationModal).show();
+		verify(mockApproveUserAccessModal).configure(actList, entityBundle);
 		verify(mockApproveUserAccessModal).show();
 	}
 	
