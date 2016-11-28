@@ -37,6 +37,7 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 	public static final String WHERE = " WHERE \"Dataset Id\"= \"";	
 	public static final String QUERY_CANCELLED = "Query cancelled";
 	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "User has been approved, but an error was encountered while emailing them: ";
+	public static final String REJECT_BUT_FAIL_TO_EMAIL = "An error was encountered while emailing the users: ";
 	public static final String APPROVED_USER = "Successfully Approved Request";
 	public static final String REJECTED_USER = "Successfully Rejected Request";
 	public static final String EMAIL_SENT = "An email has been sent to notify them";
@@ -51,6 +52,7 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 	private String message;
 	private EntityBundle entityBundle;
 	private boolean approve;
+	private Set<String> users;
 	
 	private ApproveConfirmationModalView view;
 	private SynapseAlert synAlert;
@@ -78,12 +80,14 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 
 	public void configure(ACTAccessRequirement accessRequirement, List<String> users, EntityBundle bundle, boolean approve) {
 		this.approve = approve;
+		this.users = new HashSet<String>(users);
 		view.setState(approve);
 		if (approve) {
 			view.setLoadingEmailWidget(this.progressWidget.asWidget());
 			view.startLoadingEmail();
 			loadEmailMessage();
 		}
+		this.userId = "3345921";
 		this.entityBundle = bundle;
 		this.accessRequirement = accessRequirement.getId();
 		view.setAccessReqNumber(this.accessRequirement);
@@ -185,7 +189,7 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 	
 	private void approveRequest() {
 		ACTAccessApproval aa  = new ACTAccessApproval();
-		aa.setAccessorId("3345921");  //user id - mine for now; eventually will be a list of users
+		aa.setAccessorId(userId);  //user id - mine for now; eventually will be a list of users
 		aa.setApprovalStatus(ACTApprovalStatus.APPROVED);
 		aa.setRequirementId(accessRequirement);
 		synapseClient.createAccessApproval(aa, new AsyncCallback<AccessApproval>() {
@@ -198,50 +202,31 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 
 			@Override
 			public void onSuccess(AccessApproval result) {
-				sendEmail(result);						
+				sendEmail();						
 			}
 		});
 	}
 	
 	private void rejectRequest() {
-		ACTAccessApproval aa  = new ACTAccessApproval();
-		aa.setAccessorId("3345921");  //user id - mine for now; eventually will be a list of users
-		aa.setApprovalStatus(ACTApprovalStatus.PENDING);
-		aa.setRequirementId(accessRequirement);
-		
-		//eventually will have a deleteAccessApproval method in synapseClient
-		
-		synapseClient.createAccessApproval(aa, new AsyncCallback<AccessApproval>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-				view.setProcessing(false);
-			}
-
-			@Override
-			public void onSuccess(AccessApproval result) {
-				sendEmail(result);						
-			}
-		});
+		// need to update table containing requests to mark this request as rejected
+		// don't remove access that might already exist
+		sendEmail();
 	}
 	
-	private void sendEmail(AccessApproval result) {
-		Set<String> recipients = new HashSet<String>();
-		recipients.add(userId);
-		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
+	private void sendEmail() {
+		synapseClient.sendMessage(users, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setProcessing(false);
-				synAlert.showError(APPROVE_BUT_FAIL_TO_EMAIL + caught.getMessage());
+				synAlert.showError((approve ? APPROVE_BUT_FAIL_TO_EMAIL : REJECT_BUT_FAIL_TO_EMAIL) + caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(String result) {
 				view.setProcessing(false);
 				view.hide();
-				view.showInfo(APPROVED_USER, EMAIL_SENT);
+				view.showInfo(approve ? APPROVED_USER : REJECTED_USER, EMAIL_SENT);
 			}
 		});
 	}
