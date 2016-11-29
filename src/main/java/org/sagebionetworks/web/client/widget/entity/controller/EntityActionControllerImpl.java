@@ -711,8 +711,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		approveConfirmationModal.configure(actRequirements.get(0), users, entityBundle, true);
 		approveConfirmationModal.show();
 		
-		approveUserAccessModal.configure(actRequirements, entityBundle);
-		approveUserAccessModal.show();
+//		approveUserAccessModal.configure(actRequirements, entityBundle);
+//		approveUserAccessModal.show();
 	}
 	
 

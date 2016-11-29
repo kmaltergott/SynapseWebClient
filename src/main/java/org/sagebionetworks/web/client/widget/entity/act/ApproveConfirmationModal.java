@@ -126,7 +126,6 @@ public class ApproveConfirmationModal implements ApproveConfirmationModalView.Pr
 
 			@Override
 			public void onCancel() {
-				view.setLoadingEmailVisible(false);
 				view.finishLoadingEmail();
 				synAlert.showError(QUERY_CANCELLED);
 			}
