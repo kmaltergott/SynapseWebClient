@@ -69,11 +69,11 @@ public class ApproveConfirmationModalTest {
 		dialog = new ApproveConfirmationModal(mockView, mockSynAlert, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget, mockUserBadgeList);
 		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn("syn7444807");
 		when(mockEntityBundle.getEntity()).thenReturn(mockEntity);
+		dialog.configure(mockAccReq, new ArrayList<String>(), mockEntityBundle, true);
 	}
 	
 	@Test
 	public void testConfigureApprove() {
-		dialog.configure(mockAccReq, new ArrayList<String>(), mockEntityBundle, true);
 		verify(mockView).setState(true);
 		verify(mockView, times(2)).setLoadingEmailWidget(mockProgressWidget.asWidget());
 		verify(mockView).startLoadingEmail();
@@ -84,6 +84,7 @@ public class ApproveConfirmationModalTest {
 	
 	@Test
 	public void testConfigureReject() {
+		reset(mockView);
 		dialog.configure(mockAccReq, new ArrayList<String>(), mockEntityBundle, false);
 		verify(mockView).setState(false);
 		verify(mockView, times(0)).setLoadingEmailWidget(mockProgressWidget.asWidget());
@@ -95,7 +96,6 @@ public class ApproveConfirmationModalTest {
 	
 	@Test
 	public void testProgressWidgetFailure() {
-		dialog.configure(mockAccReq, new ArrayList<String>(), mockEntityBundle, true);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), eq(AsynchType.TableQuery), any(AsynchronousRequestBody.class), aph.capture());
 		aph.getValue().onFailure(any(Throwable.class));
 		verify(mockView).setLoadingEmailVisible(false);
@@ -104,10 +104,8 @@ public class ApproveConfirmationModalTest {
 	
 	@Test
 	public void testProgressWidgetCancel() {
-		dialog.configure(mockAccReq, new ArrayList<String>(), mockEntityBundle, true);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), eq(AsynchType.TableQuery), any(AsynchronousRequestBody.class), aph.capture());
 		aph.getValue().onCancel();
-		verify(mockView).setLoadingEmailVisible(false);
 		verify(mockView).finishLoadingEmail();
 		verify(mockSynAlert).showError(QUERY_CANCELLED);
 	}
@@ -115,17 +113,49 @@ public class ApproveConfirmationModalTest {
 	@Test
 	public void testProgressWidgetComplete() {
 		QueryResultBundle qrb = new QueryResultBundle();
-		dialog.configure(mockAccReq, new ArrayList<String>(), mockEntityBundle, true);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), eq(AsynchType.TableQuery), any(AsynchronousRequestBody.class), aph.capture());
 		aph.getValue().onComplete(qrb);
 		verify(mockView).finishLoadingEmail();
 	}
 	
+	@Test
+	public void testShow() {
+		dialog.show();
+		verify(mockSynAlert).clear();
+		verify(mockView).show();
+	}
 	
+	@Test
+	public void testSubmitNoMessage() {
+		dialog.onSubmit();
+		when(mockView.getEmailMessage()).thenReturn("");
+		verify(mockSynAlert).showError(MESSAGE_BLANK);
+		verify(mockView, times(0)).setProcessing(anyBoolean());
+	}
 	
+	@Test
+	public void testSubmitApproveFailure() {
+		dialog.onSubmit();
+		when(mockView.getEmailMessage()).thenReturn("Message");
+		verify(mockSynAlert).showError(MESSAGE_BLANK);
+		verify(mockView, times(0)).setProcessing(anyBoolean());
+	}
 	
+	@Test
+	public void testSubmitApproveSuccess() {
+		dialog.onSubmit();
+		when(mockView.getEmailMessage()).thenReturn("Message");
+		verify(mockSynAlert).showError(MESSAGE_BLANK);
+		verify(mockView, times(0)).setProcessing(anyBoolean());
+	}
 	
-	
+	@Test
+	public void testSubmitReject() {
+		dialog.onSubmit();
+		when(mockView.getEmailMessage()).thenReturn("");
+		verify(mockSynAlert).showError(MESSAGE_BLANK);
+		verify(mockView, times(0)).setProcessing(anyBoolean());
+	}
 	
 	
 	
