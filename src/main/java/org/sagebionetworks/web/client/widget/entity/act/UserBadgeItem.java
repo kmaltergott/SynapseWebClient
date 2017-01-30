@@ -16,12 +16,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-/**
- * Widget representing a file handle, on click will call back with the file handle id.
- * If isSelectable then will show a checkbox.
- * @author jayhodgson
- *
- */
+
 public class UserBadgeItem implements IsWidget, SelectableListItem {
 	public interface UserBadgeItemUiBinder extends UiBinder<Widget, UserBadgeItem> {}
 	
@@ -101,4 +96,3 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		return widget;
 	}
 }
-

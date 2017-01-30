@@ -73,6 +73,7 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style;
@@ -117,7 +118,7 @@ public class DisplayUtils {
 				"  <span data-notify=\"message\">{2}</span>\n" + 
 				"  <a href=\"{3}\" target=\"{4}\" data-notify=\"url\"></a>\n" + 
 				"</div>");
-		
+		notifySettings.setNewestOnTop(true);
 		return notifySettings;
 	}
 	/**
@@ -145,23 +146,6 @@ public class DisplayUtils {
         }
         return df.format(size) + " bytes";
     }
-	
-	public static String getFileNameFromExternalUrl(String path){
-		//grab the text between the last '/' and following '?'
-		String fileName = "";
-		if (path != null) {
-			int lastSlash = path.lastIndexOf("/");
-			if (lastSlash > -1) {
-				int firstQuestionMark = path.indexOf("?", lastSlash);
-				if (firstQuestionMark > -1) {
-					fileName = path.substring(lastSlash+1, firstQuestionMark);
-				} else {
-					fileName = path.substring(lastSlash+1);
-				}
-			}
-		}
-		return fileName;
-	}
 	
 	/**
 	 * Handles the exception. Returns true if the user has been alerted to the exception already

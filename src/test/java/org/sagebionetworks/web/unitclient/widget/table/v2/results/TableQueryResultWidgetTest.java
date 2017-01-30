@@ -6,7 +6,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +18,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.UnauthorizedException;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
@@ -54,7 +58,7 @@ public class TableQueryResultWidgetTest {
 	Query query;
 	QueryResultBundle bundle;
 	PartialRowSet delta;
-	SortItem sort;
+	List<SortItem> sortList;
 	Row row;
 	RowSet rowSet;
 	QueryResult results;
@@ -100,9 +104,11 @@ public class TableQueryResultWidgetTest {
 		bundle.setQueryCount(88L);
 		bundle.setQueryResult(results);
 		
-		sort = new SortItem();
+		sortList = new ArrayList<SortItem>();
+		SortItem sort = new SortItem();
 		sort.setColumn("a");
 		sort.setDirection(SortDirection.DESC);
+		sortList.add(sort);
 		AsyncMockStubber.callSuccessWith(Arrays.asList(sort)).when(mockSynapseClient).getSortFromTableQuery(any(String.class),  any(AsyncCallback.class));
 		
 		// delta
@@ -124,7 +130,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sort), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -156,18 +162,6 @@ public class TableQueryResultWidgetTest {
 	}
 	
 	@Test
-	public void testConfigureNotLoggedIn() {
-		boolean isEditable = false;
-		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(false);
-		widget.configure(query, isEditable, isView, mockListner);
-		verify(mockView).setTableVisible(false);
-		verify(mockView).setProgressWidgetVisible(false);
-		verify(mockView).setErrorVisible(true);
-		verify(mockView).setSynapseAlertWidget(any(Widget.class));
-		verify(mockSynapseAlert).showLogin();
-	}
-	
-	@Test
 	public void testConfigureSuccessNotEditable(){
 		boolean isEditable = false;
 		isView = true;
@@ -179,7 +173,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sort), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -200,7 +194,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sort), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -232,7 +226,7 @@ public class TableQueryResultWidgetTest {
 	public void testConfigurError(){
 		boolean isEditable = true;
 		// Setup a failure
-		Throwable error = new Throwable("Failed!!");
+		UnauthorizedException error = new UnauthorizedException("Failed!!");
 		jobTrackingStub.setError(error);
 		// Make the call that changes it all.
 		widget.configure(query, isEditable, isView, mockListner);
@@ -246,7 +240,14 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
 		verify(mockView, times(2)).setTableVisible(false);
+		// note that if not logged in, synapse alert will show prompt the user to login in order to run the query.
 		verify(mockSynapseAlert).handleException(error);
+	}
+	
+	@Test
+	public void testSetFacetsVisible() {
+		widget.setFacetsVisible(true);
+		verify(mockPageWidget).setFacetsVisible(true);
 	}
 	
 }

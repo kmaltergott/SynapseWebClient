@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -96,12 +95,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.isView = isView;
 		this.startingQuery = query;
 		this.queryListener = listener;
-		if (!synapseAlert.isUserLoggedIn()) {
-			setupErrorState();
-			synapseAlert.showLogin();
-		} else {
-			runQuery();
-		}
+		runQuery();
 	}
 
 	private void runQuery() {
@@ -159,12 +153,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.bundle = bundle;
 		this.view.setErrorVisible(false);
 		this.view.setProgressWidgetVisible(false);
-		SortItem sort = null;
-		if(sortItems != null && !sortItems.isEmpty()){
-			sort = sortItems.get(0);
-		}
 		// configure the page widget
-		this.pageViewerWidget.configure(bundle, this.startingQuery,sort, false, isView, null, this, facetChangedHandler);
+		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, isView, null, this, facetChangedHandler);
 		this.view.setTableVisible(true);
 		fireFinishEvent(true, isQueryResultEditable());
 	}
@@ -242,7 +232,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			this.queryResultEditor = ginInjector.createNewQueryResultEditorWidget();
 			view.setEditorWidget(this.queryResultEditor);
 		}
-		this.queryResultEditor.showEditor(bundle, new Callback() {
+		this.queryResultEditor.showEditor(bundle, isView, new Callback() {
 			@Override
 			public void invoke() {
 				runQuery();
@@ -286,6 +276,10 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			public void onSuccess(String sql) {
 				runSql(sql);
 			}});
+	}
+	
+	public void setFacetsVisible(boolean visible) {
+		pageViewerWidget.setFacetsVisible(visible);
 	}
 	
 }

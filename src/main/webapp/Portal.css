@@ -691,6 +691,9 @@ a.shortBtn {
 .min-width-25 {
 	min-width: 25px;
 }
+.min-width-150 {
+	min-width: 150px;
+}
 .min-width-200 {
 	min-width: 200px;
 }
@@ -1026,8 +1029,6 @@ a.shortBtn {
 .markdown code {
 	background-clip: padding-box;
     border-radius: 3px 3px 3px 3px;
-    color: #666666;
-    font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
     font-family: Courier,monospace;
     padding: 0 5px 2px;
     overflow:auto;
@@ -1158,6 +1159,12 @@ span.font-size-13,
 i.font-size-1x {
 	font-size:1em;
 }
+
+.font-size-0-9em, #rootPanel .font-size-0-9em,
+i.font-size-0-9em, #rootPanel i.font-size-0-9em {
+	font-size:0.9em;
+}
+
 .font-size-1-5x,
 i.font-size-1-5x {
 	font-size:1.5em;
@@ -1791,7 +1798,7 @@ ol.lowerroman {
 	position: relative;
 	top: -10px;
 }
-.moveup-8 {
+.moveup-8, #rootPanel .moveup-8 {
 	position: relative;
 	top: -8px;
 }
@@ -2217,6 +2224,7 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 }
 
 
+
 .gwt-TreeItem-selected [class*="link"] {
 	text-decoration: underline;
 }
@@ -2263,6 +2271,11 @@ iframe[seamless] {
 .modal {
     overflow-y: auto !important;
 }
+
+.bootbox {
+	z-index: 2000 !important;
+}
+
 
 .dropdown-menu>li>a, 
 .x-menu-list-item>a:visited,

@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -14,6 +16,7 @@ import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
@@ -42,20 +45,26 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	String tableId;
 	boolean isView;
 	FacetsWidget facetsWidget;
-	
+	ClientCache clientCache;
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
 	boolean isSelectionChanging;
 	
 	@Inject
-	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, DetailedPaginationWidget paginationWidget, FacetsWidget facetsWidget){
+	public TablePageWidget(TablePageView view, 
+			PortalGinInjector ginInjector, 
+			DetailedPaginationWidget paginationWidget, 
+			FacetsWidget facetsWidget,
+			ClientCache clientCache){
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
 		this.view = view;
 		this.view.setPaginationWidget(paginationWidget);
 		this.facetsWidget = facetsWidget;
+		this.clientCache = clientCache;
 		view.setFacetsWidget(facetsWidget.asWidget());
+		view.setPresenter(this);
 	}
 	
 	/**
@@ -68,7 +77,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	 */
 	public void configure(QueryResultBundle bundle, 
 			Query query, 
-			SortItem sort, 
+			List<SortItem> sortList, 
 			boolean isEditable, 
 			boolean isView, 
 			RowSelectionListener rowSelectionListener, 
@@ -89,6 +98,12 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		types = ColumnModelUtils.buildTypesForQueryResults(QueryBundleUtils.getSelectFromBundle(bundle), bundle.getColumnModels());
 		// setup the headers from the types
 		List<IsWidget> headers = new ArrayList<IsWidget>();
+		Map<String, SortItem> sortedHeaders = new HashMap<String, SortItem>();
+		if (sortList != null) {
+			for (SortItem sort : sortList) {
+				sortedHeaders.put(sort.getColumn(), sort);
+			}	
+		}
 		for (ColumnModel type: types) {
 			// Create each header
 			String headerName = type.getName();
@@ -97,13 +112,12 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 				SortableTableHeader sth = ginInjector.createSortableTableHeader();
 				sth.configure(type.getName(), pageChangeListener);
 				headers.add(sth);
-				if(sort != null){
-					if(headerName.equals(sort.getColumn())){
-						if(SortDirection.DESC.equals(sort.getDirection())){
-							sth.setIcon(IconType.SORT_DESC);
-						}else{
-							sth.setIcon(IconType.SORT_ASC);
-						}
+				if(sortedHeaders.containsKey(headerName)) {
+					SortItem sortItem = sortedHeaders.get(headerName);
+					if(SortDirection.DESC.equals(sortItem.getDirection())){
+						sth.setIcon(IconType.SORT_DESC);
+					}else{
+						sth.setIcon(IconType.SORT_ASC);
 					}
 				}
 			}else{
@@ -123,14 +137,13 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}
 		List<FacetColumnResult> facets = bundle.getFacets();
 		
-		boolean isFacetsWidgetVisible = !isEditable && 
+		boolean isFacetsSupported = !isEditable && 
 				facetChangedHandler != null && 
 				facets != null && 
 				!facets.isEmpty();
 		
-		if (isFacetsWidgetVisible) {
+		if (isFacetsSupported) {
 			facetsWidget.configure(facets, facetChangedHandler, types);
-			view.setFacetsVisible(facetsWidget.isShowingFacets());
 		} else {
 			view.setFacetsVisible(false);	
 		}
@@ -141,6 +154,13 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			// Create the row 
 			addRow(row, isEditable);
 		}
+		String isRecentlyModifiedView = clientCache.get(tableId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
+		view.setViewRecentlyModifiedAlertvisible(isRecentlyModifiedView != null);
+	}
+	
+	@Override
+	public void viewRecentlyModifiedAlertDismissed() {
+		clientCache.remove(tableId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
 	}
 
 	/**
@@ -292,5 +312,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			}
 		}
 		return isValid;
+	}
+	
+	public void setFacetsVisible(boolean visible) {
+		view.setFacetsVisible(visible);
 	}
 }

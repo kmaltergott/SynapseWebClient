@@ -37,41 +37,43 @@ public class FacetsWidget implements IsWidget {
 				columnName2ColumnModel.put(columnModel.getName(), columnModel);
 			}
 			for (FacetColumnResult facet : facets) {
-				switch(facet.getFacetType()) {
-					case enumeration:
-						FacetColumnResultValues facetResultValues = (FacetColumnResultValues)facet;
-						// if values are not set, then don't show the facet
-						if (facetResultValues.getFacetValues() != null && facetResultValues.getFacetValues().size() > 0) {
-							FacetColumnResultValuesWidget valuesWidget = ginInjector.getFacetColumnResultValuesWidget();
-							valuesWidget.configure(facetResultValues, facetChangedHandler);
-							view.add(valuesWidget);
-							isShowingFacets = true;
-						}
-						break;
-					case range:
-						FacetColumnResultRange rangeFacet = (FacetColumnResultRange)facet;
-						// if there are no values found in the column, don't show the facet
-						if (rangeFacet.getColumnMin() != null) {
-							isShowingFacets = true;
-							ColumnModel cm = columnName2ColumnModel.get(facet.getColumnName());
-							if (ColumnType.INTEGER.equals(cm.getColumnType())) {
-								FacetColumnResultSliderRangeWidget rangeWidget = ginInjector.getFacetColumnResultSliderRangeWidget();
-								rangeWidget.configure(rangeFacet, facetChangedHandler);
-								view.add(rangeWidget);	
-							} else if (ColumnType.DOUBLE.equals(cm.getColumnType())) {
-								FacetColumnResultRangeWidget rangeWidget = ginInjector.getFacetColumnResultRangeWidget();
-								rangeWidget.configure(rangeFacet, facetChangedHandler);
-								view.add(rangeWidget);
-							} else if (ColumnType.DATE.equals(cm.getColumnType())) {
-								FacetColumnResultDateRangeWidget rangeWidget = ginInjector.getFacetColumnResultDateRangeWidget();
-								rangeWidget.configure(rangeFacet, facetChangedHandler);
-								view.add(rangeWidget);
+				ColumnModel cm = columnName2ColumnModel.get(facet.getColumnName());
+				if (cm != null) {
+					switch(facet.getFacetType()) {
+						case enumeration:
+							FacetColumnResultValues facetResultValues = (FacetColumnResultValues)facet;
+							// if values are not set, then don't show the facet
+							if (facetResultValues.getFacetValues() != null && facetResultValues.getFacetValues().size() > 0) {
+								FacetColumnResultValuesWidget valuesWidget = ginInjector.getFacetColumnResultValuesWidget();
+								valuesWidget.configure(facetResultValues, cm.getColumnType(), facetChangedHandler);
+								view.add(valuesWidget);
+								isShowingFacets = true;
 							}
-						}
-						
-						break;
-					default:
-						break;
+							break;
+						case range:
+							FacetColumnResultRange rangeFacet = (FacetColumnResultRange)facet;
+							// if there are no values found in the column, don't show the facet
+							if (rangeFacet.getColumnMin() != null) {
+								isShowingFacets = true;
+								if (ColumnType.INTEGER.equals(cm.getColumnType())) {
+									FacetColumnResultSliderRangeWidget rangeWidget = ginInjector.getFacetColumnResultSliderRangeWidget();
+									rangeWidget.configure(rangeFacet, facetChangedHandler);
+									view.add(rangeWidget);	
+								} else if (ColumnType.DOUBLE.equals(cm.getColumnType())) {
+									FacetColumnResultRangeWidget rangeWidget = ginInjector.getFacetColumnResultRangeWidget();
+									rangeWidget.configure(rangeFacet, facetChangedHandler);
+									view.add(rangeWidget);
+								} else if (ColumnType.DATE.equals(cm.getColumnType())) {
+									FacetColumnResultDateRangeWidget rangeWidget = ginInjector.getFacetColumnResultDateRangeWidget();
+									rangeWidget.configure(rangeFacet, facetChangedHandler);
+									view.add(rangeWidget);
+								}
+							}
+							
+							break;
+						default:
+							break;
+					}
 				}
 			}
 		}
